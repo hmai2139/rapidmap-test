@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// A 9x9 Sudoku game for RapidMap Developer Test Q2.
-/// User can input their own puzzles, or generate random puzzles.
+/// User can input their own puzzles.
 /// Can be solved manually or automatically using a backtracking algorithm.
 class Sudoku extends StatefulWidget {
   const Sudoku({super.key});
@@ -15,7 +15,7 @@ class _SudokuState extends State<Sudoku> {
   int N = 9;
 
   /// The initial puzzle.
-  List<List<int>> puzzle = [
+  final List<List<int>> _puzzle = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -27,14 +27,8 @@ class _SudokuState extends State<Sudoku> {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ];
 
-  /// The puzzle being solved.
-  late List<List<int>> currentPuzzle;
-
-  @override
-  void initState() {
-    currentPuzzle = puzzle;
-    super.initState();
-  }
+  /// Whether a puzzle is being solved;
+  bool isSolving = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,25 +36,43 @@ class _SudokuState extends State<Sudoku> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: 1.0,
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black54, width: 1)),
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: N,
-                      childAspectRatio: 1
-                    ),
-                    itemBuilder: _buildTile,
-                    itemCount: N * N,
-                  ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            /// Game board.
+            AspectRatio(
+              aspectRatio: 1.0,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black54, width: 1)),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: N, childAspectRatio: 1),
+                  itemBuilder: _buildTile,
+                  itemCount: N * N,
                 ),
               ),
-            ]),
+            ),
+            const SizedBox(height: 20),
+            /// Button rows.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: Colors.blueGrey),
+                  onPressed: () {},
+                  child: const Text('Clear'),
+                ),
+                const SizedBox(width: 10),
+                FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: Colors.blueAccent),
+                  onPressed: () {},
+                  child: const Text('Solve'),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -73,6 +85,7 @@ class _SudokuState extends State<Sudoku> {
     int x = (index / N).floor();
     int y = (index % N);
 
+    int val = _puzzle[x][y];
     return GestureDetector(
       onTap: () => _tileOnTap(x, y),
       child: Container(
@@ -84,11 +97,12 @@ class _SudokuState extends State<Sudoku> {
         ),
         child: Center(
           child: Text(
-            puzzle[x][y].toString(),
-            style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: true ? Colors.blue : Colors.black),
+            val > 0 ? val.toString() : " ",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: isSolving ? Colors.blueAccent : Colors.black,
+            ),
           ),
         ),
       ),
@@ -118,7 +132,7 @@ class _SudokuState extends State<Sudoku> {
                     ),
                     onPressed: () {
                       setState(() {
-                        puzzle[x][y] = val;
+                        _puzzle[x][y] = val;
                       });
                       Navigator.of(context).pop();
                     },
@@ -126,7 +140,7 @@ class _SudokuState extends State<Sudoku> {
                       val.toString(),
                       style: const TextStyle(
                           fontSize: 20,
-                          color: Colors.black,
+                          color: Colors.blueAccent,
                           fontWeight: FontWeight.w500),
                     ),
                   ),

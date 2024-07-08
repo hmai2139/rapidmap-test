@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku.dart';
+import 'package:rapidmap_test/sudoku/sudoku.dart';
 
 void main() {
   runApp(const MyApp());
