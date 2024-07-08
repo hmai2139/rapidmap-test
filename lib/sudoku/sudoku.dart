@@ -172,33 +172,32 @@ class _SudokuState extends State<Sudoku> {
       context: context,
       builder: (context) => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
-          child: GridView.count(
-            crossAxisCount: 5,
-            childAspectRatio: 2,
-            mainAxisSpacing: 1,
-            crossAxisSpacing: 1,
-            children: [for (var i = 0; i < 10; i++) i]
-                .map(
-                  (val) => OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        _puzzle[row][col] = val;
-                        _isValid = solver.isValidSudoku(_puzzle);
-                      });
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      val.toString(),
-                      style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.blueAccent,
-                          fontWeight: FontWeight.w500),
-                    ),
+        child: GridView.count(
+          shrinkWrap: true,
+          crossAxisCount: 5,
+          childAspectRatio: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 5,
+          children: [for (var i = 0; i < 10; i++) i]
+              .map(
+                (val) => OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _puzzle[row][col] = val;
+                      _isValid = solver.isValidSudoku(_puzzle);
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    val.toString(),
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.w500),
                   ),
-                )
-                .toList(),
-          ),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
