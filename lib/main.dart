@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rapidmap_test/sudoku/sudoku.dart';
+import 'package:rapidmap_test/to_do_list/to_do_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,7 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Sudoku(),
+        // child: Sudoku(),
+        child: ToDoList(),
       ),
     );
   }
