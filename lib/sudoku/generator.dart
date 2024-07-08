@@ -1,7 +1,8 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 
-/// Generate random sudoku puzzles for testing.
-/// Credit: ChatGPT.
+/// Methods to generate sudoku puzzles for testing.
+/// The random generator methods are credited to ChatGPT.
 
 void main() {
   List<List<List<int>>> puzzles = generateSudokuPuzzles(50);
@@ -115,7 +116,15 @@ bool fillRemaining(List<List<int>> sudoku, int i, int j) {
 /// Creates an unsolved puzzle by setting cells to zero.
 void removeDigits(List<List<int>> sudoku) {
   Random random = Random();
-  int count = 40;
+
+  /// Removes at least 40, configurable;
+  int minRemove = 40;
+
+  /// Minimum clues # is 17, so can remove (81 - 17 = 64) at most.
+  int maxRemove = 64;
+
+  int count = random.nextInt(maxRemove - minRemove) + minRemove;
+
   while (count != 0) {
     int cellId = random.nextInt(81);
     int i = cellId ~/ 9;
@@ -134,3 +143,10 @@ void printSudoku(List<List<int>> sudoku) {
     print(row);
   }
 }
+
+/// Generates an empty 9x9 Sudoku puzzle.
+List<List<int>> generateEmptySudoku() =>
+    List.generate(9, (_) => List.generate(9, (_) => 0));
+
+List<List<Color>> generateColours() =>
+    List.generate(9, (_) => List.generate(9, (_) => Colors.black));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rapidmap_test/sudoku/generator.dart' as generator;
 
 /// A 9x9 Sudoku game for RapidMap Developer Test Q2.
 /// User can input their own puzzles.
@@ -14,21 +15,21 @@ class _SudokuState extends State<Sudoku> {
   /// Assume all puzzles are NxN.
   int N = 9;
 
-  /// The initial puzzle.
-  final List<List<int>> _puzzle = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ];
+  List<List<int>> _puzzle = generator.generateEmptySudoku();
 
-  /// Whether a puzzle is being solved;
-  bool isSolving = false;
+  /// Colour array to differentiate numbers from input and solution.
+  List<List<Color>> _colours = generator.generateColours();
+
+  void _generate() {
+    setState(() {
+      _puzzle = generator.generateSudoku();
+    });
+  }
+
+  void _initialise() {
+    _puzzle = generator.generateEmptySudoku();
+    _colours = generator.generateColours();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,6 @@ class _SudokuState extends State<Sudoku> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             /// Game board.
@@ -44,7 +44,8 @@ class _SudokuState extends State<Sudoku> {
               aspectRatio: 1.0,
               child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black54, width: 1)),
+                  border: Border.all(color: Colors.black54, width: 1),
+                ),
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: N, childAspectRatio: 1),
@@ -54,21 +55,33 @@ class _SudokuState extends State<Sudoku> {
               ),
             ),
             const SizedBox(height: 20),
+
             /// Button rows.
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: Colors.blueGrey),
-                  onPressed: () {},
+                OutlinedButton(
+                  style:
+                      FilledButton.styleFrom(foregroundColor: Colors.black54),
+                  onPressed: () => setState(() {
+                    _initialise();
+                  }),
                   child: const Text('Clear'),
                 ),
                 const SizedBox(width: 10),
                 FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: Colors.blueAccent),
+                  style: FilledButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  onPressed: _generate,
+                  child: const Text('Randomise'),
+                ),
+                const SizedBox(width: 10),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                      backgroundColor: Colors.blueAccent),
                   onPressed: () {},
                   child: const Text('Solve'),
-                )
+                ),
               ],
             ),
           ],
@@ -101,7 +114,7 @@ class _SudokuState extends State<Sudoku> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,
-              color: isSolving ? Colors.blueAccent : Colors.black,
+              color: _colours[x][y],
             ),
           ),
         ),
@@ -112,15 +125,17 @@ class _SudokuState extends State<Sudoku> {
   /// Shows a number picker of 1 to 9.
   /// Sets the number of the (x, y) tile to the picked number.
   void _tileOnTap(int x, int y) {
-    showDialog(
-      barrierDismissible: true,
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        content: SizedBox(
-          width: MediaQuery.of(context).size.width * .7,
-          height: MediaQuery.of(context).size.width * .7,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black54, width: 1),
+          ),
           child: GridView.count(
             crossAxisCount: 3,
+            childAspectRatio: 2,
             children: [for (var i = 1; i < 10; i++) i]
                 .map(
                   (val) => OutlinedButton(
