@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:rapidmap_test/to_do_list/database.dart' as database;
+import 'package:rapidmap_test/to_do_list/database.dart';
+import 'package:rapidmap_test/to_do_list/helper.dart';
 import 'package:rapidmap_test/to_do_list/task.dart';
 
 class ToDoList extends StatefulWidget {
@@ -17,17 +17,7 @@ class _ToDoListState extends State<ToDoList> {
   List<Task> _tasks = [];
   late Future<void> _tasksFuture = _initTasks();
 
-  Future<void> _initTasks() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
-    _tasks = await database.getTasks();
-  }
-
-  Future<void> _refreshTasks() async {
-    final tasks = await database.getTasks();
-    setState(() {
-      _tasks = tasks;
-    });
-  }
+  final DatabaseHelper databaseHelper = DatabaseHelper.helper;
 
   @override
   void initState() {
@@ -67,10 +57,8 @@ class _ToDoListState extends State<ToDoList> {
                       ? ListView.builder(
                           physics: const AlwaysScrollableScrollPhysics(),
                           itemCount: _tasks.length,
-                          itemBuilder: (BuildContext context, index) =>
-                              ListTile(
-                            title: Text(_tasks[index].title),
-                          ),
+                          itemBuilder: (BuildContext context, int index) =>
+                              _buildTask(_tasks[index]),
                         )
                       : const Center(
                           child: Column(
@@ -106,16 +94,83 @@ class _ToDoListState extends State<ToDoList> {
     return Card(
       child: ListTile(
         title: Text(task.title),
-        subtitle: Text(
-          task.description,
-          overflow: TextOverflow.ellipsis,
+        leading: task.completed > 0
+            ? GestureDetector(
+                onTap: () => _updateTask(task, 0),
+                child: const Icon(
+                  Icons.check_circle,
+                  size: 25,
+                  color: Colors.blueAccent,
+                ),
+              )
+            : GestureDetector(
+                onTap: () => _updateTask(task, 1),
+                child: const Icon(Icons.check_circle_outline, size: 25),
+              ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              task.description,
+              style: const TextStyle(color: Colors.black, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Icon(
+                  Icons.calendar_today,
+                  size: 12,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  formatDate(task.dueDate),
+                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ],
         ),
-        trailing: const Icon(Icons.edit),
+        trailing: const Icon(Icons.edit, size: 25),
       ),
     );
   }
 
   void _addTask() {
     showModalBottomSheet(context: context, builder: (context) => Container());
+  }
+
+  Future<void> _initTasks() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+    _tasks = await databaseHelper.getTasks();
+    _tasks = [
+      Task(
+        id: 1,
+        title: 'Test 1',
+        description: 'Test desc',
+        dueDate: DateTime.now().millisecondsSinceEpoch,
+        completed: 0,
+      ),
+      Task(
+        id: 2,
+        title: 'Test 2',
+        description: 'Test desc longggggggggggggggggggggggggggggggggggggg',
+        dueDate: DateTime.now().millisecondsSinceEpoch + 10000,
+        completed: 1,
+      )
+    ];
+  }
+
+  Future<void> _refreshTasks() async {
+    final tasks = await databaseHelper.getTasks();
+    setState(() {
+      _tasks = tasks;
+    });
+  }
+
+  Future<void> _updateTask(Task task, int status) async {
+    await databaseHelper.updateCompletionStatus(task, status);
+    _refreshTasks();
   }
 }
