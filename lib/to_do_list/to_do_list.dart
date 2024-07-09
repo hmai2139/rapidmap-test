@@ -23,7 +23,7 @@ class _ToDoListState extends State<ToDoList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.deepPurple,
         title: const Text(
           "To-Do List",
           style: TextStyle(color: Colors.white),
@@ -32,7 +32,7 @@ class _ToDoListState extends State<ToDoList> {
       body: DefaultTabController(
         length: 3,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const TabBar(
               tabs: [
@@ -59,7 +59,7 @@ class _ToDoListState extends State<ToDoList> {
       ),
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.deepPurple,
         onPressed: () => _inputTask(null),
         tooltip: 'Add a new task',
         child: const Icon(
@@ -81,7 +81,7 @@ class _ToDoListState extends State<ToDoList> {
           case ConnectionState.active:
             return const Center(
                 child: CircularProgressIndicator(
-              color: Colors.blueAccent,
+              color: Colors.deepPurple,
             ));
 
           case ConnectionState.done:
@@ -111,17 +111,15 @@ class _ToDoListState extends State<ToDoList> {
                     itemBuilder: (BuildContext context, int index) =>
                         _buildTaskItem(tasks[index]),
                   )
-                : const Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Add a new task',
-                          style: TextStyle(color: Colors.black54),
-                        ),
-                      ],
-                    ),
+                : const Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'No tasks found',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ],
                   );
         }
       },
@@ -136,15 +134,21 @@ class _ToDoListState extends State<ToDoList> {
         title: Text(task.title),
         leading: task.completed > 0
             ? GestureDetector(
-                onTap: () => taskProvider.updateTaskCompletion(task, 0),
+                onTap: () {
+                  taskProvider.updateTaskCompletion(task, 0);
+                  showSnackBar(context, 'Task updated');
+                },
                 child: const Icon(
                   Icons.check_circle,
                   size: 25,
-                  color: Colors.blueAccent,
+                  color: Colors.deepPurple,
                 ),
               )
             : GestureDetector(
-                onTap: () => taskProvider.updateTaskCompletion(task, 1),
+                onTap: () {
+                  taskProvider.updateTaskCompletion(task, 1);
+                  showSnackBar(context, 'Task updated');
+                },
                 child: const Icon(Icons.check_circle_outline, size: 25),
               ),
         subtitle: Column(

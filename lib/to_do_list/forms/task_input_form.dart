@@ -106,16 +106,18 @@ class _TaskInputFormState extends State<TaskInputForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OutlinedButton(
-                  style:
-                      FilledButton.styleFrom(foregroundColor: Colors.black54),
-                  onPressed: () {},
-                  child: const Text('Clear'),
-                ),
+                widget.task?.id != null
+                    ? FilledButton(
+                        style: FilledButton.styleFrom(
+                            backgroundColor: Colors.redAccent),
+                        onPressed: () => _deleteTask(widget.task!.id!),
+                        child: const Text('Delete'),
+                      )
+                    : const SizedBox.shrink(),
                 const SizedBox(width: 10),
                 FilledButton(
                   style: FilledButton.styleFrom(
-                      backgroundColor: Colors.blueAccent),
+                      backgroundColor: Colors.deepPurple),
                   onPressed: () async {
                     /// Validate the form before submission.
                     if (_formKey.currentState!.validate()) {
@@ -153,7 +155,7 @@ class _TaskInputFormState extends State<TaskInputForm> {
                       }
                     }
                   },
-                  child: const Text('Add'),
+                  child: Text(widget.task?.id != null ? 'Update' : 'Add'),
                 ),
               ],
             ),
@@ -209,5 +211,32 @@ class _TaskInputFormState extends State<TaskInputForm> {
       return 'Please select a due date';
     }
     return null;
+  }
+
+  /// Show Task deletion confirmation dialog.
+  void _deleteTask(int taskId) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Delete task'),
+        content: const Text('Deletion cannot be reversed.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () {
+              Provider.of<TaskProvider>(context, listen: false)
+                  .deleteTask(taskId);
+              showSnackBar(context, 'Task deleted');
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 }

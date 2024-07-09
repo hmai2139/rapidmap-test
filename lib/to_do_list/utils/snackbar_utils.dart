@@ -8,7 +8,7 @@ void showSnackBar(BuildContext context, String text) {
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(24),
     ),
-    backgroundColor: Colors.deepPurple,
+    backgroundColor: Colors.deepPurpleAccent,
     duration: const Duration(seconds: 1),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
