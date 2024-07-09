@@ -170,7 +170,7 @@ class _TaskInputFormState extends State<TaskInputForm> {
       firstDate: DateTime.now(),
 
       /// Users would most certainly be dead before then.
-      lastDate: DateTime.now().add(const Duration(days: 365 + 100)),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 100)),
     );
 
     if (selectedDate != null) {

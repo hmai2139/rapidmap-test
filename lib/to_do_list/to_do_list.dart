@@ -6,6 +6,8 @@ import 'package:rapidmap_test/to_do_list/utils/datetime_utils.dart' as utils;
 import 'package:rapidmap_test/to_do_list/models/task.dart';
 import 'package:rapidmap_test/to_do_list/utils/snackbar_utils.dart';
 
+import 'models/task_filter_options.dart';
+
 class ToDoList extends StatefulWidget {
   const ToDoList({super.key});
 
@@ -14,11 +16,7 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  /// Enables pull-to-refresh functionality.
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-
-  /// Default sort order.
+  /// Sort by ascending due date by default.
   bool _ascending = true;
 
   @override
@@ -31,47 +29,32 @@ class _ToDoListState extends State<ToDoList> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: FutureBuilder<void>(
-          future: _fetchTasks(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            final taskProvider = Provider.of<TaskProvider>(context);
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(
-                    child: CircularProgressIndicator(
-                  color: Colors.blueAccent,
-                ));
-
-              case ConnectionState.done:
-                return RefreshIndicator(
-                  key: _refreshIndicatorKey,
-                  onRefresh: _fetchTasks,
-                  child: taskProvider.tasks.isNotEmpty
-                      ? ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: taskProvider.tasks.length,
-                          itemBuilder: (BuildContext context, int index) =>
-                              _buildTask(taskProvider.tasks[index]),
-                        )
-                      : const Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Add a new task',
-                                style: TextStyle(color: Colors.black54),
-                              ),
-                            ],
-                          ),
-                        ),
-                );
-            }
-          },
+      body: DefaultTabController(
+        length: 3,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const TabBar(
+              tabs: [
+                Tab(text: 'All'),
+                Tab(text: 'Completed'),
+                Tab(text: 'To-Do'),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: _buildSortOptions(),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildTaskList(TaskFilterOption.all),
+                  _buildTaskList(TaskFilterOption.completed),
+                  _buildTaskList(TaskFilterOption.uncompleted),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -87,15 +70,70 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
-  /// Builds a single Task widget.
-  Card _buildTask(Task task) {
+  /// Display Tasks based on their completion status.
+  FutureBuilder _buildTaskList(TaskFilterOption filterOption) {
+    return FutureBuilder<void>(
+      future: _fetchTasks(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return const Center(
+                child: CircularProgressIndicator(
+              color: Colors.blueAccent,
+            ));
+
+          case ConnectionState.done:
+            final taskProvider = Provider.of<TaskProvider>(context);
+            List<Task> tasks = taskProvider.tasks;
+            tasks.sort((a, b) {
+              if (_ascending) {
+                return a.dueDate.compareTo(b.dueDate);
+              } else {
+                return b.dueDate.compareTo(a.dueDate);
+              }
+            });
+            switch (filterOption) {
+              case TaskFilterOption.all:
+                break;
+              case TaskFilterOption.completed:
+                tasks = tasks.where((task) => task.completed > 0).toList();
+                break;
+              case TaskFilterOption.uncompleted:
+                tasks = tasks.where((task) => task.completed == 0).toList();
+                break;
+            }
+            return tasks.isNotEmpty
+                ? ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: tasks.length,
+                    itemBuilder: (BuildContext context, int index) =>
+                        _buildTaskItem(tasks[index]),
+                  )
+                : const Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Add a new task',
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  );
+        }
+      },
+    );
+  }
+
+  /// Build a single Task widget.
+  Widget _buildTaskItem(Task task) {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     return Card(
       child: ListTile(
-        title: Text(
-          task.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(task.title),
         leading: task.completed > 0
             ? GestureDetector(
                 onTap: () => taskProvider.updateTaskCompletion(task, 0),
@@ -114,7 +152,7 @@ class _ToDoListState extends State<ToDoList> {
           children: [
             Text(
               task.description,
-              style: const TextStyle(color: Colors.black, fontSize: 12, fontStyle: FontStyle.italic),
+              style: const TextStyle(color: Colors.black, fontSize: 12),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 5),
@@ -151,13 +189,13 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
-  /// Fetch tasks from TaskProvider.
+  /// Get Tasks from Provider.
   Future<void> _fetchTasks() async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     await taskProvider.getTasks();
   }
 
-  /// Insert or update a Task.
+  /// Insert/Update a Task.
   void _inputTask(Task? inputTask) {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -177,7 +215,7 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
-  /// Shows Task deletion confirmation dialog.
+  /// Show Task deletion confirmation dialog.
   void _deleteTask(int taskId) {
     showDialog<void>(
       context: context,
@@ -202,5 +240,55 @@ class _ToDoListState extends State<ToDoList> {
         ],
       ),
     );
+  }
+
+  /// Build a dropdown menu to sort Task.
+  DropdownButtonHideUnderline _buildSortOptions() {
+    TextStyle style = const TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.normal,
+      color: Colors.black54,
+    );
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<bool>(
+        value: _ascending,
+        icon: const Icon(Icons.sort, color: Colors.black54),
+        onChanged: (bool? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _ascending = newValue;
+            });
+            Provider.of<TaskProvider>(context, listen: false)
+                .sortTasksByDueDate(_ascending);
+          }
+        },
+        items: [
+          DropdownMenuItem<bool>(
+            value: true,
+            child: Text(
+              'Earliest First',
+              style: style,
+            ),
+          ),
+          DropdownMenuItem<bool>(
+            value: false,
+            child: Text(
+              'Latest First',
+              style: style,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _sortTasksByDueDate(List<Task> task) {
+    return task.sort((a, b) {
+      if (_ascending) {
+        return a.dueDate.compareTo(b.dueDate);
+      } else {
+        return b.dueDate.compareTo(a.dueDate);
+      }
+    });
   }
 }
