@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku/generator.dart' as generator;
-import 'package:rapidmap_test/sudoku/solver.dart' as solver;
+import 'package:rapidmap_test/sudoku/utils/generator.dart' as generator;
+import 'package:rapidmap_test/sudoku/utils/solver.dart' as solver;
 
 /// A 9x9 Sudoku game for RapidMap Developer Test Q2.
 /// User can input their own puzzles.
@@ -104,7 +104,7 @@ class _SudokuState extends State<Sudoku> {
                 children: [
                   OutlinedButton(
                     style:
-                        FilledButton.styleFrom(foregroundColor: Colors.black54),
+                        OutlinedButton.styleFrom(foregroundColor: Colors.black54),
                     onPressed: () => setState(() {
                       _initialise();
                     }),

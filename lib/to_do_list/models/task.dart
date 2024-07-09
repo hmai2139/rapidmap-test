@@ -1,13 +1,13 @@
 /// Task data model.
 class Task {
-  final int id;
+  final int? id;
   final String title;
   final String description;
   final int dueDate;
   final int completed;
 
   const Task({
-    required this.id,
+    this.id,
     required this.title,
     required this.description,
     required this.dueDate,

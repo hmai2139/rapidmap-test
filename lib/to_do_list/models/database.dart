@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
-import 'package:rapidmap_test/to_do_list/task.dart';
+import 'package:rapidmap_test/to_do_list/models/task.dart';
 import 'package:sqflite/sqflite.dart';
 
 String tableName = "tasks";
@@ -9,17 +9,13 @@ String tableName = "tasks";
 class DatabaseHelper {
   static Database? _database;
 
+  /// Max lengths of title and description, in # characters.
+  static int maxTitleLength = 30;
+  static int maxDescriptionLength = 100;
+
   /// Ensures only 1 instance of DatabaseHelper is instantiated.
   static final DatabaseHelper helper = DatabaseHelper._secretConstructor();
   DatabaseHelper._secretConstructor();
-
-  /// Get a reference to the database.
-  Future<Database> get dataBase async {
-    if (_database != null) return _database!;
-
-    _database = await helper.dataBase;
-    return _database!;
-  }
 
   Future<Database> _createDatabase() async {
     /// Avoid errors caused by flutter upgrade.
@@ -33,7 +29,17 @@ class DatabaseHelper {
       onCreate: (db, version) {
         /// Run the CREATE TABLE statement on the database.
         return db.execute(
-          'CREATE TABLE tasks(id INTEGER PRIMARY KEY, title TEXT, description TEXT, dueDate INTEGER, completed INTEGER)',
+          '''CREATE TABLE tasks (
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL DEFAULT Task ,
+            description TEXT NOT NULL DEFAULT A new task,
+            dueDate INTEGER NOT NULL,
+            completed INTEGER NOT NULL DEFAULT 0
+            CHECK (
+              length(title) <= $maxTitleLength)
+              length(description) <= $maxDescriptionLength)
+            )
+          )''',
         );
       },
 
@@ -43,17 +49,28 @@ class DatabaseHelper {
     );
   }
 
+  /// Get a reference to the database.
+  Future<Database> get dataBase async {
+    if (_database != null) return _database!;
+
+    _database = await _createDatabase();
+    return _database!;
+  }
+
   /// Inserts [Task] into the database.
   Future<void> insertTask(Task task) async {
     /// Get a reference to the database.
     final db = await helper.dataBase;
 
-    /// Inserts the Task into the correct table. Replaces duplicate with new data.
+    /// Inserts the Task into the correct table.
+    /// Replaces duplicate with new data.
     await db.insert(
       tableName,
       task.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    ).then((result) {
+      print("insert result:$result");
+    });
   }
 
   /// Retrieves all the [Task] objects from the database.
@@ -97,18 +114,22 @@ class DatabaseHelper {
 
       /// Pass the Task's id as a whereArg to prevent SQL injection.
       whereArgs: [task.id],
-    );
+
+    ).then((result) {
+      print("update result:$result");
+    });
   }
 
   /// Update a [Task]'s completion status'.
   Future<void> updateCompletionStatus(Task task, int status) async {
     await updateTask(
       Task(
-          id: task.id,
-          title: task.title,
-          description: task.description,
-          dueDate: task.dueDate,
-          completed: status),
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        dueDate: task.dueDate,
+        completed: status,
+      ),
     );
   }
 

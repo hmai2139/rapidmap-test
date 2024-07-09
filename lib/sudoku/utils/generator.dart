@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku/solver.dart' as solver;
+import 'package:rapidmap_test/sudoku/utils/solver.dart' as solver;
 
 /// Methods to generate puzzle puzzles for testing.
 /// The random generator methods are credited to ChatGPT.
