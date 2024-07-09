@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rapidmap_test/to_do_list/models/database.dart';
 import 'package:rapidmap_test/to_do_list/models/task.dart';
 import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
+import 'package:rapidmap_test/to_do_list/utils/snackbar_utils.dart';
 import '../utils/datetime_utils.dart' as utils;
 import 'package:flutter/services.dart';
 
@@ -135,16 +136,20 @@ class _TaskInputFormState extends State<TaskInputForm> {
                       if (widget.task != null) {
                         final updateResult =
                             await taskProvider.updateTask(newTask);
-                        _showSnackBar('Task updated');
-                        if (context.mounted) Navigator.of(context).pop();
+                        if (context.mounted) {
+                          showSnackBar(context, 'Task updated');
+                          Navigator.of(context).pop();
+                        }
                       }
 
                       /// Otherwise add Task to the database.
                       else {
                         final addResult =
                             await taskProvider.insertTask(newTask);
-                        _showSnackBar('Task added');
-                        if (context.mounted) Navigator.of(context).pop();
+                        if (context.mounted) {
+                          showSnackBar(context, 'Task added');
+                          Navigator.of(context).pop();
+                        }
                       }
                     }
                   },
@@ -204,24 +209,5 @@ class _TaskInputFormState extends State<TaskInputForm> {
       return 'Please select a due date';
     }
     return null;
-  }
-
-  void _showSnackBar(String text) {
-    final snackBar = SnackBar(
-      content: Text(text),
-      action: SnackBarAction(
-        label: 'Dismiss',
-        textColor: Colors.white,
-        onPressed: () {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        },
-      ),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      backgroundColor: Colors.deepPurple,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

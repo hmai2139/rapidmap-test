@@ -4,6 +4,7 @@ import 'package:rapidmap_test/to_do_list/forms/task_input_form.dart';
 import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
 import 'package:rapidmap_test/to_do_list/utils/datetime_utils.dart' as utils;
 import 'package:rapidmap_test/to_do_list/models/task.dart';
+import 'package:rapidmap_test/to_do_list/utils/snackbar_utils.dart';
 
 class ToDoList extends StatefulWidget {
   const ToDoList({super.key});
@@ -17,13 +18,8 @@ class _ToDoListState extends State<ToDoList> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  late Future<void> _tasksFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _tasksFuture = _initTasks();
-  }
+  /// Default sort order.
+  bool _ascending = true;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +34,7 @@ class _ToDoListState extends State<ToDoList> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: FutureBuilder<void>(
-          future: _tasksFuture,
+          future: _fetchTasks(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             final taskProvider = Provider.of<TaskProvider>(context);
             switch (snapshot.connectionState) {
@@ -53,7 +49,7 @@ class _ToDoListState extends State<ToDoList> {
               case ConnectionState.done:
                 return RefreshIndicator(
                   key: _refreshIndicatorKey,
-                  onRefresh: _refreshTasks,
+                  onRefresh: _fetchTasks,
                   child: taskProvider.tasks.isNotEmpty
                       ? ListView.builder(
                           physics: const AlwaysScrollableScrollPhysics(),
@@ -91,11 +87,15 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
+  /// Builds a single Task widget.
   Card _buildTask(Task task) {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     return Card(
       child: ListTile(
-        title: Text(task.title),
+        title: Text(
+          task.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         leading: task.completed > 0
             ? GestureDetector(
                 onTap: () => taskProvider.updateTaskCompletion(task, 0),
@@ -114,7 +114,7 @@ class _ToDoListState extends State<ToDoList> {
           children: [
             Text(
               task.description,
-              style: const TextStyle(color: Colors.black, fontSize: 12),
+              style: const TextStyle(color: Colors.black, fontSize: 12, fontStyle: FontStyle.italic),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 5),
@@ -142,7 +142,7 @@ class _ToDoListState extends State<ToDoList> {
               child: const Icon(Icons.edit, size: 25, color: Colors.deepPurple),
             ),
             GestureDetector(
-              onTap: () => taskProvider.deleteTask(task.id!),
+              onTap: () => _deleteTask(task.id!),
               child: const Icon(Icons.delete, size: 25),
             ),
           ],
@@ -151,16 +151,13 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
-  Future<void> _initTasks() async {
+  /// Fetch tasks from TaskProvider.
+  Future<void> _fetchTasks() async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     await taskProvider.getTasks();
   }
 
-  Future<void> _refreshTasks() async {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    await taskProvider.getTasks();
-  }
-
+  /// Insert or update a Task.
   void _inputTask(Task? inputTask) {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -180,6 +177,7 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
+  /// Shows Task deletion confirmation dialog.
   void _deleteTask(int taskId) {
     showDialog<void>(
       context: context,
@@ -196,32 +194,13 @@ class _ToDoListState extends State<ToDoList> {
             onPressed: () {
               Provider.of<TaskProvider>(context, listen: false)
                   .deleteTask(taskId);
-
+              showSnackBar(context, 'Task deleted');
               Navigator.pop(context);
             },
-            child: const Text('Randomise'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
-  }
-
-  void _showSnackBar(String text) {
-    final snackBar = SnackBar(
-      content: Text(text),
-      action: SnackBarAction(
-        label: 'Dismiss',
-        textColor: Colors.white,
-        onPressed: () {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        },
-      ),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      backgroundColor: Colors.deepPurple,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

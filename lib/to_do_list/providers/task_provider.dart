@@ -33,4 +33,15 @@ class TaskProvider extends ChangeNotifier {
     await _databaseHelper.deleteTask(id);
     await getTasks();
   }
+
+  void sortTasksByDueDate(bool ascending) {
+    _tasks.sort((Task t1, Task t2) {
+      if (ascending) {
+        return t1.dueDate.compareTo(t2.dueDate);
+      } else {
+        return t2.dueDate.compareTo(t1.dueDate);
+      }
+    });
+    notifyListeners();
+  }
 }
