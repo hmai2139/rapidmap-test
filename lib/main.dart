@@ -38,32 +38,69 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentPageIndex = 0;
 
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  List<String> pages = ['To-Do List', 'Sudoku'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: (int index) =>
-              setState(() => _currentPageIndex = index),
-          indicatorColor: Colors.deepPurpleAccent,
-          selectedIndex: _currentPageIndex,
-          destinations: const <Widget>[
-            NavigationDestination(
-              icon: Icon(Icons.task_outlined),
-              label: 'To-Do List',
-            ),
-            NavigationDestination(
-              icon: Badge(child: Icon(Icons.border_all_rounded)),
-              label: 'Sudoku',
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        title: Text(
+          pages[_currentPageIndex],
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => _currentPageIndex = index);
+          },
+          children: const <Widget>[
+            ToDoList(),
+            Sudoku(),
           ],
         ),
-        body: Center(
-            child: [
-          /// To-Do List page.
-          const ToDoList(),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentPageIndex,
+        selectedItemColor: Colors.deepPurpleAccent,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        onTap: _onItemTapped,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              label: 'To-Do List', icon: Icon(Icons.task_outlined)),
+          BottomNavigationBarItem(
+            label: ('Sudoku'),
+            icon: Icon(Icons.border_all_rounded),
+            backgroundColor: Colors.lightBlue,
+          ),
+        ],
+      ),
+    );
+  }
 
-          /// Sudoku page.
-          const Sudoku()
-        ][_currentPageIndex]));
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentPageIndex = index;
+
+      /// Animate navigation between pages.
+      _pageController.animateToPage(index,
+          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    });
   }
 }

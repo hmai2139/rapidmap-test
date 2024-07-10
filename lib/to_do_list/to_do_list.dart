@@ -22,13 +22,6 @@ class _ToDoListState extends State<ToDoList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: const Text(
-          "To-Do List",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
       body: DefaultTabController(
         length: 3,
         child: Column(
