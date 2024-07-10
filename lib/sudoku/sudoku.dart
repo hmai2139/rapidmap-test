@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rapidmap_test/utils/list_utils.dart';
-import 'package:rapidmap_test/sudoku/helpers/sudoku_generator.dart' as generator;
+import 'package:rapidmap_test/sudoku/helpers/sudoku_generator.dart'
+    as generator;
 import 'package:rapidmap_test/sudoku/helpers/sudoku_solver.dart' as solver;
 
 import '../stylings/app_colours.dart';
@@ -30,12 +31,16 @@ class _SudokuState extends State<Sudoku> {
   /// Whether puzzle is invalid.
   bool _isValid = false;
 
+  /// Whether puzzle is solved.
+  bool _isSolved = false;
+
   /// Generate a Sudoku puzzle.
   void _generate() {
     setState(() {
       _puzzle = generator.generateSudoku();
       _colours = generator.generateColours(_puzzle);
       _isValid = true;
+      _isSolved = false;
     });
   }
 
@@ -44,6 +49,7 @@ class _SudokuState extends State<Sudoku> {
     _puzzle = generator.generateEmptySudoku();
     _colours = generator.generateColours(_puzzle);
     _isValid = true;
+    _isSolved = false;
   }
 
   /// Attempt to solve the puzzle.
@@ -55,6 +61,7 @@ class _SudokuState extends State<Sudoku> {
     if (solution.solvable) {
       setState(() {
         _colours = generator.generateColours(unsolved);
+        _isSolved = true;
       });
       showSnackBar(context, 'Puzzle solved');
     }
@@ -137,11 +144,15 @@ class _SudokuState extends State<Sudoku> {
                   FilledButton(
                     style: FilledButton.styleFrom(
                         backgroundColor: AppColours.accent),
-                    onPressed: _isValid
+                    onPressed: _isValid && !_isSolved
                         ? _solvePuzzle
                         : () => showSnackBar(
-                            context, 'Invalid puzzle. Please check your inputs',
-                            duration: const Duration(seconds: 2),),
+                              context,
+                              _isSolved
+                                  ? 'Puzzle is solved. Press Clear or Randomise to try-again.'
+                                  : 'Invalid puzzle. Please check your inputs',
+                              duration: const Duration(seconds: 2),
+                            ),
                     child: const Text('Solve'),
                   ),
                 ],
@@ -161,7 +172,7 @@ class _SudokuState extends State<Sudoku> {
 
     int val = _puzzle[row][col];
     return GestureDetector(
-      onTap: () => _tileOnTap(row, col),
+      onTap: _isSolved ? null : () => _tileOnTap(row, col),
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
