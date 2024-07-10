@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../stylings/app_colours.dart';
+import '../stylings/app_colours.dart';
 
 /// Shows a Snackbar with [text].
 void showSnackBar(BuildContext context, String text) {

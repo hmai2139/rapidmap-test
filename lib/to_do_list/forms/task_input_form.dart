@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rapidmap_test/to_do_list/models/database.dart';
 import 'package:rapidmap_test/to_do_list/models/task.dart';
 import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
-import 'package:rapidmap_test/to_do_list/utils/snackbar_utils.dart';
+import 'package:rapidmap_test/utils/snackbar_utils.dart';
 import '../../stylings/app_colours.dart';
 import '../utils/datetime_utils.dart' as utils;
 import 'package:flutter/services.dart';

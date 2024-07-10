@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku/utils/generator.dart' as generator;
-import 'package:rapidmap_test/sudoku/utils/solver.dart' as solver;
+import 'package:rapidmap_test/sudoku/utils/list_utils.dart';
+import 'package:rapidmap_test/sudoku/utils/sudoku_generator.dart' as generator;
+import 'package:rapidmap_test/sudoku/utils/sudoku_solver.dart' as solver;
 
 import '../stylings/app_colours.dart';
+import '../utils/snackbar_utils.dart';
 
 /// A 9x9 Sudoku game for RapidMap Developer Test Q2.
 /// User can input their own puzzles.
@@ -18,6 +20,7 @@ class _SudokuState extends State<Sudoku> {
   /// Assume all puzzles are NxN.
   int N = 9;
 
+  /// Default puzzle board.
   List<List<int>> _puzzle = generator.generateEmptySudoku();
 
   /// Colour array to differentiate numbers from input and solution.
@@ -27,42 +30,48 @@ class _SudokuState extends State<Sudoku> {
   /// Whether puzzle is invalid.
   bool _isValid = false;
 
+  /// Generate a Sudoku puzzle.
   void _generate() {
     setState(() {
       _puzzle = generator.generateSudoku();
+      _colours = generator.generateColours(_puzzle);
       _isValid = true;
     });
   }
 
+  /// Initialise an empty board.
   void _initialise() {
     _puzzle = generator.generateEmptySudoku();
     _colours = generator.generateColours(_puzzle);
+    _isValid = true;
   }
 
-  _solvePuzzle() {
+  /// Attempt to solve the puzzle.
+  dynamic _solvePuzzle() {
+    final List<List<int>> unsolved = deepCopy(_puzzle);
     solver.Solution solution = solver.solve(_puzzle, 0, 0);
+
+    /// Display the solution if found.
     if (solution.solvable) {
       setState(() {
-        _colours = List.generate(
-            9,
-            (row) => List.generate(
-                9,
-                (col) =>
-                    _puzzle[row][col] > 0 ? Colors.black : AppColours.primary));
-        _puzzle = solution.puzzle;
+        _colours = generator.generateColours(unsolved);
       });
-    } else {
+      showSnackBar(context, 'Puzzle solved');
+    }
+
+    /// Otherwise display an error message.
+    else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(
               "No solutions found",
-              style: TextStyle(color: AppColours.primary),
+              style: TextStyle(color: AppColours.subtext),
             ),
-            content: const Text(
+            content: Text(
               "The puzzle may be invalid or insufficient clues were provided.",
-              style: TextStyle(color: Colors.black54),
+              style: TextStyle(color: AppColours.subtext),
             ),
             actions: [
               TextButton(
@@ -93,7 +102,7 @@ class _SudokuState extends State<Sudoku> {
                 aspectRatio: 1.0,
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black54, width: 1),
+                    border: Border.all(color: AppColours.subtext, width: 1),
                   ),
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -111,7 +120,7 @@ class _SudokuState extends State<Sudoku> {
                 children: [
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black54),
+                        foregroundColor: AppColours.subtext),
                     onPressed: () => setState(() {
                       _initialise();
                     }),
@@ -127,8 +136,8 @@ class _SudokuState extends State<Sudoku> {
                   const SizedBox(width: 10),
                   FilledButton(
                     style: FilledButton.styleFrom(
-                        backgroundColor: Colors.blueAccent),
-                    onPressed: _isValid ? _solvePuzzle : null,
+                        backgroundColor: AppColours.accent),
+                    onPressed: _isValid ? _solvePuzzle : _solvePuzzle,
                     child: const Text('Solve'),
                   ),
                 ],
@@ -141,8 +150,6 @@ class _SudokuState extends State<Sudoku> {
   }
 
   /// A single tile on the puzzle board.
-  ///
-  /// The number will be blue if [isInitial] is true, and black otherwise.
   Widget _buildTile(BuildContext context, int index) {
     /// Calculates coordinates (x, col) from [index].
     int row = (index / N).floor();
@@ -154,7 +161,7 @@ class _SudokuState extends State<Sudoku> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.black54,
+            color: AppColours.subtext,
             width: 1,
           ),
         ),
@@ -191,15 +198,16 @@ class _SudokuState extends State<Sudoku> {
                   onPressed: () {
                     setState(() {
                       _puzzle[row][col] = val;
+                      _colours[row][col] = AppColours.text;
                       _isValid = solver.isValidSudoku(_puzzle);
                     });
                     Navigator.of(context).pop();
                   },
                   child: Text(
                     val.toString(),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 20,
-                        color: Colors.blueAccent,
+                        color: AppColours.text,
                         fontWeight: FontWeight.w500),
                   ),
                 ),

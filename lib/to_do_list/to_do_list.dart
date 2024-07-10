@@ -4,7 +4,7 @@ import 'package:rapidmap_test/to_do_list/forms/task_input_form.dart';
 import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
 import 'package:rapidmap_test/to_do_list/utils/datetime_utils.dart' as utils;
 import 'package:rapidmap_test/to_do_list/models/task.dart';
-import 'package:rapidmap_test/to_do_list/utils/snackbar_utils.dart';
+import 'package:rapidmap_test/utils/snackbar_utils.dart';
 
 import '../stylings/app_colours.dart';
 import 'models/task_filter_options.dart';
@@ -105,13 +105,13 @@ class _ToDoListState extends State<ToDoList> {
                     itemBuilder: (BuildContext context, int index) =>
                         _buildTaskItem(tasks[index]),
                   )
-                : const Column(
+                : Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'No tasks found',
-                        style: TextStyle(color: Colors.black54),
+                        style: TextStyle(color: AppColours.subtext),
                       ),
                     ],
                   );
@@ -150,7 +150,7 @@ class _ToDoListState extends State<ToDoList> {
           children: [
             Text(
               task.description,
-              style: const TextStyle(color: Colors.black, fontSize: 12),
+              style: TextStyle(color: AppColours.text, fontSize: 12),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 5),
@@ -163,7 +163,7 @@ class _ToDoListState extends State<ToDoList> {
                 const SizedBox(width: 5),
                 Text(
                   utils.formatDate(task.dueDate),
-                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                  style: TextStyle(color: AppColours.subtext, fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -242,15 +242,15 @@ class _ToDoListState extends State<ToDoList> {
 
   /// Build a dropdown menu to sort Task.
   DropdownButtonHideUnderline _buildSortOptions() {
-    TextStyle style = const TextStyle(
+    TextStyle style = TextStyle(
       fontSize: 15,
       fontWeight: FontWeight.normal,
-      color: Colors.black54,
+      color: AppColours.subtext,
     );
     return DropdownButtonHideUnderline(
       child: DropdownButton<bool>(
         value: _ascending,
-        icon: const Icon(Icons.sort, color: Colors.black54),
+        icon: Icon(Icons.sort, color: AppColours.subtext),
         onChanged: (bool? newValue) {
           if (newValue != null) {
             setState(() {

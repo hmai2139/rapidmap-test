@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku/utils/solver.dart' as solver;
+import 'package:rapidmap_test/sudoku/utils/sudoku_solver.dart' as solver;
+
+import '../../stylings/app_colours.dart';
 
 /// Methods to generate puzzle puzzles for testing.
 /// The random generator methods are credited to ChatGPT.
@@ -134,7 +136,8 @@ List<List<int>> generateEmptySudoku() =>
 List<List<Color>> generateColours(List<List<int>> puzzle) {
   return List.generate(9, (row) {
     return List.generate(9, (col) {
-      return puzzle[row][col] > 0 ? Colors.black : Colors.blueAccent;
+      return puzzle[row][col] > 0 ? AppColours.text : AppColours.primary;
     });
   });
 }
+
