@@ -57,6 +57,14 @@ class DatabaseHelper {
     return _database!;
   }
 
+  /// Close the database
+  Future<void> closeDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
+  }
+
   /// Retrieves all the [Task] objects from the database.
   /// Return a List of [Task]s if successful, an empty List otherwise.
   Future<List<Task>> getTasks() async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku/utils/list_utils.dart';
-import 'package:rapidmap_test/sudoku/utils/sudoku_generator.dart' as generator;
-import 'package:rapidmap_test/sudoku/utils/sudoku_solver.dart' as solver;
+import 'package:rapidmap_test/utils/list_utils.dart';
+import 'package:rapidmap_test/sudoku/helpers/sudoku_generator.dart' as generator;
+import 'package:rapidmap_test/sudoku/helpers/sudoku_solver.dart' as solver;
 
 import '../stylings/app_colours.dart';
 import '../utils/snackbar_utils.dart';

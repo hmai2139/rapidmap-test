@@ -124,79 +124,82 @@ class _ToDoListState extends State<ToDoList> {
   /// Build a single Task widget.
   Widget _buildTaskItem(Task task) {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    return Card(
-      child: ListTile(
-        title: Text(task.title),
-        leading: task.completed > 0
-            ? GestureDetector(
-                onTap: () async {
-                  final result =
-                      await taskProvider.updateTaskCompletion(task, 0);
-                  if (mounted) {
-                    showSnackBar(
-                        context,
-                        result > 0
-                            ? OperationResult.successUpdateUncompleted
-                            : OperationResult.errorUpdateCompletionStatus);
-                  }
-                },
-                child: Icon(
-                  Icons.check_circle,
-                  size: 25,
-                  color: AppColours.accent,
+    return GestureDetector(
+      onTap: () => _inputTask(task),
+      child: Card(
+        child: ListTile(
+          title: Text(task.title),
+          leading: task.completed > 0
+              ? GestureDetector(
+                  onTap: () async {
+                    final result =
+                        await taskProvider.updateTaskCompletion(task, 0);
+                    if (mounted) {
+                      showSnackBar(
+                          context,
+                          result > 0
+                              ? OperationResult.successUpdateUncompleted
+                              : OperationResult.errorUpdateCompletionStatus);
+                    }
+                  },
+                  child: Icon(
+                    Icons.check_circle,
+                    size: 25,
+                    color: AppColours.accent,
+                  ),
+                )
+              : GestureDetector(
+                  onTap: () async {
+                    final result =
+                        await taskProvider.updateTaskCompletion(task, 1);
+                    if (mounted) {
+                      showSnackBar(
+                          context,
+                          result > 0
+                              ? OperationResult.successUpdateCompleted
+                              : OperationResult.errorUpdateCompletionStatus);
+                    }
+                  },
+                  child: const Icon(Icons.check_circle_outline, size: 25),
                 ),
-              )
-            : GestureDetector(
-                onTap: () async {
-                  final result =
-                      await taskProvider.updateTaskCompletion(task, 1);
-                  if (mounted) {
-                    showSnackBar(
-                        context,
-                        result > 0
-                            ? OperationResult.successUpdateCompleted
-                            : OperationResult.errorUpdateCompletionStatus);
-                  }
-                },
-                child: const Icon(Icons.check_circle_outline, size: 25),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                task.description,
+                style: TextStyle(color: AppColours.text, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
               ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              task.description,
-              style: TextStyle(color: AppColours.text, fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                const Icon(
-                  Icons.calendar_today,
-                  size: 12,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  utils.formatDate(task.dueDate),
-                  style: TextStyle(color: AppColours.subtext, fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: () => _inputTask(task),
-              child: Icon(Icons.edit, size: 25, color: AppColours.primary),
-            ),
-            GestureDetector(
-              onTap: () => _deleteTask(task.id!),
-              child: const Icon(Icons.delete, size: 25),
-            ),
-          ],
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 12,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    utils.formatDate(task.dueDate),
+                    style: TextStyle(color: AppColours.subtext, fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => _inputTask(task),
+                child: Icon(Icons.edit, size: 25, color: AppColours.primary),
+              ),
+              GestureDetector(
+                onTap: () => _deleteTask(task.id!),
+                child: const Icon(Icons.delete, size: 25),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -300,15 +303,5 @@ class _ToDoListState extends State<ToDoList> {
         ],
       ),
     );
-  }
-
-  void _sortTasksByDueDate(List<Task> task) {
-    return task.sort((a, b) {
-      if (_ascending) {
-        return a.dueDate.compareTo(b.dueDate);
-      } else {
-        return b.dueDate.compareTo(a.dueDate);
-      }
-    });
   }
 }

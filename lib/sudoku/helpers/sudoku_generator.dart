@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:rapidmap_test/sudoku/utils/sudoku_solver.dart' as solver;
+import 'package:rapidmap_test/sudoku/helpers/sudoku_solver.dart' as solver;
 
 import '../../stylings/app_colours.dart';
 
