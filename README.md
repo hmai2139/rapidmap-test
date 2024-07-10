@@ -1,10 +1,13 @@
 # rapidmap_test
 
-Solutions to RapidMap developer test
+Solutions to RapidMap developer test.
+
 1. **To-Do List**: A To-Do List application.
 2. **Sudoku**: A Sudoku puzzle game.
 3. **Email System Automation Solution**: A PDF outlining the steps to set-up an email system
-   
+
+The To-Do List and Sudoku sub-apps can be accessed in the same application, via the bottom navigation bar.
+
 ## Installation
 1. **Install Flutter and SQLite**
 - [Flutter](https://docs.flutter.dev/get-started/codelab)
