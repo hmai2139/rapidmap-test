@@ -3,3 +3,10 @@ enum TaskFilterOption {
   completed,
   uncompleted,
 }
+
+enum DateRangeFilterOption {
+  today,
+  thisMonth,
+  custom,
+  none,
+}
