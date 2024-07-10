@@ -6,6 +6,7 @@ import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
 import 'package:rapidmap_test/to_do_list/to_do_list.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -17,11 +18,11 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => TaskProvider(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'RapidMap Developer Test',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        home: const MyHomePage(title: 'RapidMap Developer Test Home Page'),
       ),
     );
   }

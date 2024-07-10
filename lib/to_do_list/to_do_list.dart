@@ -5,10 +5,10 @@ import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
 import 'package:rapidmap_test/to_do_list/utils/datetime_utils.dart' as utils;
 import 'package:rapidmap_test/to_do_list/models/task.dart';
 import 'package:rapidmap_test/utils/snackbar_utils.dart';
-
 import '../stylings/app_colours.dart';
 import 'models/task_filter_options.dart';
 
+/// A To-Do List app for RapidMap Developer Test Q1.
 class ToDoList extends StatefulWidget {
   const ToDoList({super.key});
 
