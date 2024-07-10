@@ -17,27 +17,35 @@ class TaskProvider extends ChangeNotifier {
   }
 
   /// Insert a new [Task].
-  Future<void> insertTask(Task newTask) async {
-    await _databaseHelper.insertTask(newTask);
+  /// Returns [Task.id] if successful, and 0 otherwise.
+  Future<int> insertTask(Task newTask) async {
+    int result = await _databaseHelper.insertTask(newTask);
     await getTasks();
+    return result;
   }
 
-  /// Update a given [Task]
-  Future<void> updateTask(Task updatedTask) async {
-    await _databaseHelper.updateTask(updatedTask);
+  /// Update a given [Task].
+  /// Returns 1 if successful, 0 otherwise.
+  Future<int> updateTask(Task updatedTask) async {
+    int result = await _databaseHelper.updateTask(updatedTask);
     await getTasks();
+    return result;
   }
 
   /// Update completion status of a given [Task].
-  Future<void> updateTaskCompletion(Task task, int status) async {
-    await _databaseHelper.updateCompletionStatus(task, status);
+  /// Returns 1 if successful, 0 otherwise.
+  Future<int> updateTaskCompletion(Task task, int status) async {
+    int result = await _databaseHelper.updateCompletionStatus(task, status);
     await getTasks();
+    return result;
   }
 
   /// Delete a [Task] from the DB.
-  Future<void> deleteTask(int id) async {
-    await _databaseHelper.deleteTask(id);
+  /// Returns the numbers of rows deleted, or 0 on error.
+  Future<int> deleteTask(int id) async {
+    int result = await _databaseHelper.deleteTask(id);
     await getTasks();
+    return result;
   }
 
   /// Sort [Task]s by their due date.
