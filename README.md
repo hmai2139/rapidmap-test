@@ -10,8 +10,8 @@ The To-Do List and Sudoku sub-apps can be accessed in the same application, via 
 
 ## Installation
 1. **Install Flutter and SQLite**
-- [Flutter](https://docs.flutter.dev/get-started/codelab)
-- [SQLite](https://docs.flutter.dev/cookbook)
+- [Flutter](https://docs.flutter.dev/get-started/install)
+- [SQLite](https://www.sqlite.org/download.html)
 2. **Clone the repository:**
 
    ```bash
