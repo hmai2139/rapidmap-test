@@ -8,6 +8,8 @@ import '../../stylings/app_colours.dart';
 import '../utils/datetime_utils.dart' as utils;
 import 'package:flutter/services.dart';
 
+import '../utils/operation_result.dart';
+
 /// Form for user to add/update a [Task].
 
 class TaskInputForm extends StatefulWidget {
@@ -137,20 +139,26 @@ class _TaskInputFormState extends State<TaskInputForm> {
 
                       /// If Task's data has been passed, update Task.
                       if (widget.task != null) {
-                        final updateResult =
-                            await taskProvider.updateTask(newTask);
+                        final result = await taskProvider.updateTask(newTask);
                         if (context.mounted) {
-                          showSnackBar(context, 'Task updated');
+                          showSnackBar(
+                              context,
+                              result > 0
+                                  ? OperationResult.successUpdate
+                                  : OperationResult.errorUpdate);
                           Navigator.of(context).pop();
                         }
                       }
 
                       /// Otherwise add Task to the database.
                       else {
-                        final addResult =
-                            await taskProvider.insertTask(newTask);
+                        final result = await taskProvider.insertTask(newTask);
                         if (context.mounted) {
-                          showSnackBar(context, 'Task added');
+                          showSnackBar(
+                              context,
+                              result > 0
+                                  ? OperationResult.successInsert
+                                  : OperationResult.errorInsert);
                           Navigator.of(context).pop();
                         }
                       }
@@ -228,11 +236,18 @@ class _TaskInputFormState extends State<TaskInputForm> {
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () {
-              Provider.of<TaskProvider>(context, listen: false)
-                  .deleteTask(taskId);
-              showSnackBar(context, 'Task deleted');
-              Navigator.of(context).popUntil((route) => route.isFirst);
+            onPressed: () async {
+              final result =
+                  await Provider.of<TaskProvider>(context, listen: false)
+                      .deleteTask(taskId);
+              if (context.mounted) {
+                showSnackBar(
+                    context,
+                    result > 0
+                        ? OperationResult.successDelete
+                        : OperationResult.errorDelete);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
             },
             child: const Text('Delete'),
           ),

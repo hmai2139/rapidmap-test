@@ -4,6 +4,7 @@ import 'package:rapidmap_test/to_do_list/forms/task_input_form.dart';
 import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
 import 'package:rapidmap_test/to_do_list/utils/datetime_utils.dart' as utils;
 import 'package:rapidmap_test/to_do_list/models/task.dart';
+import 'package:rapidmap_test/to_do_list/utils/operation_result.dart';
 import 'package:rapidmap_test/utils/snackbar_utils.dart';
 import '../stylings/app_colours.dart';
 import 'models/task_filter_options.dart';
@@ -128,9 +129,16 @@ class _ToDoListState extends State<ToDoList> {
         title: Text(task.title),
         leading: task.completed > 0
             ? GestureDetector(
-                onTap: () {
-                  taskProvider.updateTaskCompletion(task, 0);
-                  showSnackBar(context, 'Task marked as uncompleted');
+                onTap: () async {
+                  final result =
+                      await taskProvider.updateTaskCompletion(task, 0);
+                  if (mounted) {
+                    showSnackBar(
+                        context,
+                        result > 0
+                            ? OperationResult.successUpdateUncompleted
+                            : OperationResult.errorUpdateCompletionStatus);
+                  }
                 },
                 child: Icon(
                   Icons.check_circle,
@@ -139,9 +147,16 @@ class _ToDoListState extends State<ToDoList> {
                 ),
               )
             : GestureDetector(
-                onTap: () {
-                  taskProvider.updateTaskCompletion(task, 1);
-                  showSnackBar(context, 'Task marked as completed');
+                onTap: () async {
+                  final result =
+                      await taskProvider.updateTaskCompletion(task, 1);
+                  if (mounted) {
+                    showSnackBar(
+                        context,
+                        result > 0
+                            ? OperationResult.successUpdateCompleted
+                            : OperationResult.errorUpdateCompletionStatus);
+                  }
                 },
                 child: const Icon(Icons.check_circle_outline, size: 25),
               ),
@@ -227,11 +242,18 @@ class _ToDoListState extends State<ToDoList> {
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () {
-              Provider.of<TaskProvider>(context, listen: false)
-                  .deleteTask(taskId);
-              showSnackBar(context, 'Task deleted');
-              Navigator.pop(context);
+            onPressed: () async {
+              final result =
+                  await Provider.of<TaskProvider>(context, listen: false)
+                      .deleteTask(taskId);
+              if (context.mounted) {
+                showSnackBar(
+                    context,
+                    result > 0
+                        ? OperationResult.successDelete
+                        : OperationResult.errorDelete);
+                Navigator.pop(context);
+              }
             },
             child: const Text('Delete'),
           ),
