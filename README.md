@@ -45,6 +45,7 @@ A task management application that allows users to create, view, edit, and delet
 - View tasks by completion status via top tab bar.
 - Tap on a task or the pen button to view/edit/delete a task.
 - Tap on the garbage bin icon to delete a task.
+- Tap on the tick icon to update a task's completion status.
 
 ### Testing
 Unit tests for database operations are available:
