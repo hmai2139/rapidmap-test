@@ -36,13 +36,34 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _currentPageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        // child: Sudoku(),
-        child: ToDoList(),
-      ),
-    );
+    return Scaffold(
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) =>
+              setState(() => _currentPageIndex = index),
+          indicatorColor: Colors.deepPurpleAccent,
+          selectedIndex: _currentPageIndex,
+          destinations: const <Widget>[
+            NavigationDestination(
+              icon: Icon(Icons.task_outlined),
+              label: 'To-Do List',
+            ),
+            NavigationDestination(
+              icon: Badge(child: Icon(Icons.border_all_rounded)),
+              label: 'Sudoku',
+            ),
+          ],
+        ),
+        body: Center(
+            child: [
+          /// To-Do List page.
+          const ToDoList(),
+
+          /// Sudoku page.
+          const Sudoku()
+        ][_currentPageIndex]));
   }
 }
