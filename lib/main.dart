@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rapidmap_test/stylings/app_colours.dart';
 import 'package:rapidmap_test/sudoku/sudoku.dart';
 import 'package:rapidmap_test/to_do_list/providers/task_provider.dart';
 import 'package:rapidmap_test/to_do_list/to_do_list.dart';
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColours.primary,
         title: Text(
           pages[_currentPageIndex],
           style: const TextStyle(color: Colors.white),
@@ -78,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentPageIndex,
-        selectedItemColor: Colors.deepPurpleAccent,
+        selectedItemColor: AppColours.primary,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[

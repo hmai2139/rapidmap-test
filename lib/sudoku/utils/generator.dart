@@ -130,5 +130,11 @@ void printSudoku(List<List<int>> puzzle) {
 List<List<int>> generateEmptySudoku() =>
     List.generate(9, (_) => List.generate(9, (_) => 0));
 
-List<List<Color>> generateColours() =>
-    List.generate(9, (_) => List.generate(9, (_) => Colors.black));
+/// Generate a matching 2D array of [Color] based on the current puzzle.
+List<List<Color>> generateColours(List<List<int>> puzzle) {
+  return List.generate(9, (row) {
+    return List.generate(9, (col) {
+      return puzzle[row][col] > 0 ? Colors.black : Colors.blueAccent;
+    });
+  });
+}

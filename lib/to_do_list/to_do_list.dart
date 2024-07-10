@@ -6,6 +6,7 @@ import 'package:rapidmap_test/to_do_list/utils/datetime_utils.dart' as utils;
 import 'package:rapidmap_test/to_do_list/models/task.dart';
 import 'package:rapidmap_test/to_do_list/utils/snackbar_utils.dart';
 
+import '../stylings/app_colours.dart';
 import 'models/task_filter_options.dart';
 
 class ToDoList extends StatefulWidget {
@@ -52,7 +53,7 @@ class _ToDoListState extends State<ToDoList> {
       ),
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColours.primary,
         onPressed: () => _inputTask(null),
         tooltip: 'Add a new task',
         child: const Icon(
@@ -72,9 +73,9 @@ class _ToDoListState extends State<ToDoList> {
           case ConnectionState.none:
           case ConnectionState.waiting:
           case ConnectionState.active:
-            return const Center(
+            return Center(
                 child: CircularProgressIndicator(
-              color: Colors.deepPurple,
+              color: AppColours.primary,
             ));
 
           case ConnectionState.done:
@@ -129,18 +130,18 @@ class _ToDoListState extends State<ToDoList> {
             ? GestureDetector(
                 onTap: () {
                   taskProvider.updateTaskCompletion(task, 0);
-                  showSnackBar(context, 'Task updated');
+                  showSnackBar(context, 'Task marked as uncompleted');
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle,
                   size: 25,
-                  color: Colors.deepPurple,
+                  color: AppColours.accent,
                 ),
               )
             : GestureDetector(
                 onTap: () {
                   taskProvider.updateTaskCompletion(task, 1);
-                  showSnackBar(context, 'Task updated');
+                  showSnackBar(context, 'Task marked as completed');
                 },
                 child: const Icon(Icons.check_circle_outline, size: 25),
               ),
@@ -174,7 +175,7 @@ class _ToDoListState extends State<ToDoList> {
           children: [
             GestureDetector(
               onTap: () => _inputTask(task),
-              child: const Icon(Icons.edit, size: 25, color: Colors.deepPurple),
+              child: Icon(Icons.edit, size: 25, color: AppColours.primary),
             ),
             GestureDetector(
               onTap: () => _deleteTask(task.id!),

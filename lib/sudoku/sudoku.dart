@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:rapidmap_test/sudoku/utils/generator.dart' as generator;
 import 'package:rapidmap_test/sudoku/utils/solver.dart' as solver;
 
+import '../stylings/app_colours.dart';
+
 /// A 9x9 Sudoku game for RapidMap Developer Test Q2.
 /// User can input their own puzzles.
 /// Can be solved manually or automatically using a backtracking algorithm.
@@ -19,7 +21,8 @@ class _SudokuState extends State<Sudoku> {
   List<List<int>> _puzzle = generator.generateEmptySudoku();
 
   /// Colour array to differentiate numbers from input and solution.
-  List<List<Color>> _colours = generator.generateColours();
+  List<List<Color>> _colours =
+      generator.generateColours(generator.generateEmptySudoku());
 
   /// Whether puzzle is invalid.
   bool _isValid = false;
@@ -33,7 +36,7 @@ class _SudokuState extends State<Sudoku> {
 
   void _initialise() {
     _puzzle = generator.generateEmptySudoku();
-    _colours = generator.generateColours();
+    _colours = generator.generateColours(_puzzle);
   }
 
   _solvePuzzle() {
@@ -45,7 +48,7 @@ class _SudokuState extends State<Sudoku> {
             (row) => List.generate(
                 9,
                 (col) =>
-                    _puzzle[row][col] > 0 ? Colors.black : Colors.blueAccent));
+                    _puzzle[row][col] > 0 ? Colors.black : AppColours.primary));
         _puzzle = solution.puzzle;
       });
     } else {
@@ -53,16 +56,20 @@ class _SudokuState extends State<Sudoku> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text(
+            title: Text(
               "No solutions found",
-              style: TextStyle(color: Colors.blueAccent),
+              style: TextStyle(color: AppColours.primary),
             ),
             content: const Text(
-                "The puzzle may be invalid or insufficient clues were provided."),
+              "The puzzle may be invalid or insufficient clues were provided.",
+              style: TextStyle(color: Colors.black54),
+            ),
             actions: [
               TextButton(
-                child: const Text("Bummer :(",
-                    style: TextStyle(color: Colors.blueAccent)),
+                child: Text(
+                  "Bummer :(",
+                  style: TextStyle(color: AppColours.primary),
+                ),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -97,14 +104,14 @@ class _SudokuState extends State<Sudoku> {
                 ),
               ),
               const SizedBox(height: 20),
-          
+
               /// Button rows.
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   OutlinedButton(
-                    style:
-                        OutlinedButton.styleFrom(foregroundColor: Colors.black54),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black54),
                     onPressed: () => setState(() {
                       _initialise();
                     }),
@@ -113,7 +120,7 @@ class _SudokuState extends State<Sudoku> {
                   const SizedBox(width: 10),
                   FilledButton(
                     style: FilledButton.styleFrom(
-                        backgroundColor: Colors.deepPurple),
+                        backgroundColor: AppColours.primary),
                     onPressed: _generate,
                     child: const Text('Randomise'),
                   ),
