@@ -137,7 +137,11 @@ class _SudokuState extends State<Sudoku> {
                   FilledButton(
                     style: FilledButton.styleFrom(
                         backgroundColor: AppColours.accent),
-                    onPressed: _isValid ? _solvePuzzle : _solvePuzzle,
+                    onPressed: _isValid
+                        ? _solvePuzzle
+                        : () => showSnackBar(
+                            context, 'Invalid puzzle. Please check your inputs',
+                            duration: const Duration(seconds: 2),),
                     child: const Text('Solve'),
                   ),
                 ],
